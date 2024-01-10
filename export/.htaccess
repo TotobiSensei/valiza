@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteRule .* - [E=REMOTE_USER:%{HTTP:Authorization},L]
+#http://www.bx-master.com/news/integratsiya-s-1s/ne-rabotaet-avtorizatsiya-pri-obmene-dannymi-s-1s/
+#http://www.rondservice.ru/company/articles/103/
+
+#RewriteCond %{HTTPS}=on
+#RewriteCond %{REQUEST_URI} ^/neoseo_exchange1c.php
+#RewriteRule (.*) http://%{HTTP_HOST}%{REQUEST_URI} [QSA,L]
+

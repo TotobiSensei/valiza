@@ -1,0 +1,648 @@
+{% if not ajax and not popup and not as_module %}
+{% set simple_page = 'simpleedit' %}
+{% set heading_title = heading_title  ~ (display_weight ? '&nbsp;(<span id="weight">' ~ weight  ~ '</span>)' : '') %}
+{% include simple_header %}
+<style>
+    {% if left_column_width %}
+        .simplecheckout-left-column {
+            width: {{ left_column_width }}%;
+        }
+        @media only screen and (max-width:1024px) {
+            .simplecheckout-left-column {
+                width: 100%;
+            }
+        }
+    {% endif %}
+    {% if right_column_width %}
+        .simplecheckout-right-column {
+            width: {{ right_column_width }}%;
+        }
+        @media only screen and (max-width:1024px) {
+            .simplecheckout-right-column {
+                width: 100%;
+            }
+        }
+    {% endif %}
+    {% if customer_with_payment_address %}
+        #simplecheckout_customer {
+            margin-bottom: 0;
+        }
+        #simplecheckout_customer .simplecheckout-block-content {
+            border-bottom-width: 0;
+            padding-bottom: 0;
+        }
+        #simplecheckout_payment_address div.checkout-heading {
+            display: none;
+        }
+        #simplecheckout_payment_address .simplecheckout-block-content {
+            border-top-width: 0;
+            padding-top: 0;
+        }
+    {% endif %}
+    {% if customer_with_shipping_address %}
+        #simplecheckout_customer {
+            margin-bottom: 0;
+        }
+        #simplecheckout_customer .simplecheckout-block-content {
+            border-bottom-width: 0;
+            padding-bottom: 0;
+        }
+        #simplecheckout_shipping_address div.checkout-heading {
+            display: none;
+        }
+        #simplecheckout_shipping_address .simplecheckout-block-content {
+            border-top-width: 0;
+            padding-top: 0;
+        }
+    {% endif %}
+</style>
+<div class="simple-content">
+{% endif %}
+    {% if not ajax or (ajax and popup) %}
+    <script type="text/javascript">
+        {% if popup %} 
+            var simpleScriptsInterval = window.setInterval(function(){
+                if (typeof jQuery !== 'undefined' && jQuery.isReady) {
+                    window.clearInterval(simpleScriptsInterval);
+
+                    if (typeof Simplecheckout !== "function") {
+                        {% for script in simple_scripts %}
+                            $("head").append('<script src="' + '{{ script }}' + '"></' + 'script>');
+                        {% endfor %}
+
+                        {% for style in simple_styles %}
+                            $("head").append('<link href="' + '{{ style }}' + '" rel="stylesheet"/>');
+                        {% endfor %}                         
+                    }
+                }
+            },0);
+        {% endif %}
+
+        var startSimpleInterval_{{ group }} = window.setInterval(function(){
+            if (typeof jQuery !== 'undefined' && typeof Simplecheckout === "function" && jQuery.isReady) {
+                window.clearInterval(startSimpleInterval_{{ group }});
+
+                var simplecheckout_{{ group }} = new Simplecheckout({
+                    mainRoute: "checkout/simplecheckout",
+                    additionalParams: "{{ additional_params }}",
+                    additionalPath: "{{ additional_path }}",
+                    mainUrl: "{{ action }}",
+                    mainContainer: "#simplecheckout_form_{{ group }}",
+                    currentTheme: "{{ current_theme }}",
+                    loginBoxBefore: "{{ login_type == 'flat' ? '#simplecheckout_customer .simplecheckout-block-content:first' : '' }}",
+                    displayProceedText: {{ display_proceed_text ? 1 : 0 }},
+                    scrollToError: {{ scroll_to_error ? 1 : 0 }},
+                    scrollToPaymentForm: {{ scroll_to_payment_form ? 1 : 0 }},
+                    notificationDefault: {{ notification_default ? 1 : 0 }},
+                    notificationToasts: {{ notification_toasts ? 1 : 0 }},
+                    notificationCheckForm: {{ notification_check_form ? 1 : 0 }},
+                    notificationCheckFormText: "{{ notification_check_form_text }}",
+                    useAutocomplete: {{ use_autocomplete ? 1 : 0 }},
+                    useGoogleApi: {{ use_google_api ? 1 : 0 }},
+                    useStorage: {{ use_storage ? 1 : 0 }},
+                    popup: {{ popup or as_module ? 1 : 0 }},
+                    agreementCheckboxStep: {{ agreement_checkbox_step ? agreement_checkbox_step : '\'0\'' }},
+                    enableAutoReloaingOfPaymentFrom: {{ enable_reloading_of_payment_form ? 1 : 0 }},
+                    javascriptCallback: function() {try{ {{ javascript_callback }} } catch (e) {console.log(e)}},
+                    stepButtons: {{ step_buttons }},
+                    menuType: {{ menu_type ? menu_type : '1' }},
+                    languageCode: "{{ language_code }}"
+                });
+
+                if (typeof toastr !== 'undefined') {
+                    toastr.options.positionClass = "{{ notification_position ? notification_position : 'toast-top-right' }}";
+                    toastr.options.timeOut = "{{ notification_timeout ? notification_timeout : '5000' }}";
+                    toastr.options.progressBar = true;
+                }
+
+                $(document).ajaxComplete(function(e, xhr, settings) {
+                    if (settings.url.indexOf("route=module/cart&remove") > 0 || (settings.url.indexOf("route=module/cart") > 0 && settings.type == "POST") || settings.url.indexOf("route=checkout/cart/add") > 0 || settings.url.indexOf("route=checkout/cart/remove") > 0) {
+                        window.resetSimpleQuantity = true;
+                        simplecheckout_{{ group }}.reloadAll();
+                    }
+                });
+
+                $(document).ajaxSend(function(e, xhr, settings) {
+                    if (settings.url.indexOf("checkout/simplecheckout&group") > 0 && typeof window.resetSimpleQuantity !== "undefined" && window.resetSimpleQuantity) {
+                        settings.data = settings.data.replace(/quantity.+?&/g,"");
+                        window.resetSimpleQuantity = false;
+                    }
+                });
+
+                simplecheckout_{{ group }}.init();
+                
+            }
+        },0);
+    </script>
+    {% endif %}
+    <div id="simplecheckout_form_{{ group }}" {{ display_error and has_error ? 'data-error="true"' : '' }} {{ logged ? 'data-logged="true"' : '' }}>
+        <div class="simplecheckout">
+            {% if not cart_empty %}
+                {% if steps_count > 1 %}
+                    {% if menu_type == '2' %}
+                        <div id="simplecheckout_step_menu" class="simplecheckout-vertical-menu simplecheckout-top-menu">
+                            {% for i in 1..steps_count %}
+                                <div class="checkout-heading simple-step-vertical" style="display:none" data-onclick="gotoStep" data-step="{{ i }}"><h4 class="panel-title">{{ step_names[i-1] }}</h4></div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div id="simplecheckout_step_menu">
+                            {% for i in 1..steps_count %}
+                                <span class="simple-step" data-onclick="gotoStep" data-step="{{ i }}">{{ step_names[i-1] }}</span>{% if i < steps_count %}<span class="simple-step-delimiter" data-step="{{ i+1 }}"><img src="{{ additional_path }}catalog/view/image/next_gray.png"></span>{% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% if steps_count > 1 and menu_type == '2' %}
+                    <div class="simplecheckout-steps-wrapper">
+                {% endif %}
+
+                {% if errors is not empty and display_error %}
+                    {% for error in errors %}
+                        <div class="alert alert-danger simplecheckout-warning-block" data-error="true">
+                            {{ error }}
+                        </div>
+                    {% endfor %}                 
+                {% endif %}
+
+                {%
+                    set replace = {
+                        '{three_column}'     : '<div class="simplecheckout-three-column">',
+                        '{/three_column}'    : '</div>',
+                        '{left_column}'      : '<div class="simplecheckout-left-column">',
+                        '{/left_column}'     : '</div>',
+                        '{right_column}'     : '<div class="simplecheckout-right-column">',
+                        '{/right_column}'    : '</div>',
+                        '{step}'             : '<div class="simplecheckout-step">',
+                        '{/step}'            : '</div>',
+                        '{clear_both}'       : '<div style="width:100%;clear:both;height:1px"></div>',
+                        '{customer}'         : simple_blocks['customer'],
+                        '{payment_address}'  : simple_blocks['payment_address'],
+                        '{shipping_address}' : simple_blocks['shipping_address'],
+                        '{cart}'             : simple_blocks['cart'],
+                        '{shipping}'         : simple_blocks['shipping'],
+                        '{payment}'          : simple_blocks['payment'],
+                        '{agreement}'        : simple_blocks['agreement'],
+                        '{help}'             : simple_blocks['help'],
+                        '{summary}'          : simple_blocks['summary'],
+                        '{comment}'          : simple_blocks['comment'],
+                        '{payment_form}'     : '<div class="simplecheckout-block" id="simplecheckout_payment_form">' ~ simple_blocks['payment_form'] ~ '</div>'
+                    }
+                %}
+
+                {% for key, value in simple_blocks %}
+                    {% set key_clear = key %}
+                    {% set key = '{' ~ key ~ '}' %}
+                    {% if replace[key] is not defined %}
+                        {% set replace = replace|merge({(key): '<div class="simplecheckout-block" id="' ~ key_clear ~ '">' ~ value ~ '</div>'}) %}
+                    {% endif %}
+                {% endfor %}
+
+                {{ simple_template|replace(replace) }}
+                
+                <div id="simplecheckout_bottom" style="width:100%;height:1px;clear:both;"></div>
+                <div class="simplecheckout-proceed-payment" id="simplecheckout_proceed_payment" style="display:none;">{{ text_proceed_payment }}</div>
+                
+                {% if display_agreement_checkbox %}
+                    <div class="alert alert-danger simplecheckout-warning-block" id="agreement_warning" {% if display_error and has_error %}data-error="true"{% else %}style="display:none;"{% endif %}>
+                        <div class="agreement_all">
+                            {% for agreement_id, warning_agreement in error_warning_agreement %}
+                                <div class="agreement_{{ agreement_id }}">{{ warning_agreement }}</div>
+                            {% endfor %}
+                        </div>                    
+                    </div>
+                {% endif %}  
+
+                <div class="simplecheckout-button-block buttons" id="buttons">
+                    <div class="simplecheckout-button-right">
+                        {% if display_agreement_checkbox %}
+                            <span id="agreement_checkbox">
+                                {% for agreement_id, text_agreement in text_agreements %}
+                                    <div class="checkbox"><label><input type="checkbox" name="agreements[]" value="{{ agreement_id }}" {{ agreement_id in agreements ? 'checked="checked"' : '' }} />{{ text_agreement }}</label></div>
+                                {% endfor %}
+                            </span>
+                        {% endif %}                
+                        {% if steps_count > 1 %}
+                        <a class="button btn-primary button_oc btn" data-onclick="nextStep" id="simplecheckout_button_next"><span>{{ button_next }}</span></a>
+                        {% endif %}
+                        <a class="button btn-primary button_oc btn" {{ block_order ? 'disabled' : ''}} data-onclick="createOrder" id="simplecheckout_button_confirm"><span>{{ button_order }}</span></a>
+                    </div>
+                    <div class="simplecheckout-button-left">
+                        {% if display_back_button %}
+                        <a class="button btn-primary button_oc btn" data-onclick="backHistory" id="simplecheckout_button_back"><span>{{ button_back }}</span></a>
+                        {% endif %}
+                        {% if steps_count > 1 %}
+                        <a class="button btn-primary button_oc btn" data-onclick="previousStep" id="simplecheckout_button_prev"><span>{{ button_prev }}</span></a>
+                        {% endif %}
+                    </div>
+                </div>    
+
+                {% if steps_count > 1 and menu_type == '2' %}
+                    </div>
+                {% endif %}
+                
+                {% if steps_count > 1 and menu_type == '2' %}
+                    <div id="simplecheckout_step_menu" class="simplecheckout-vertical-menu simplecheckout-bottom-menu">
+                        {% for i in 1..steps_count %}
+                            <div class="checkout-heading simple-step-vertical" style="display:none" data-onclick="gotoStep" data-step="{{ i }}"><h4 class="panel-title">{{ step_names[i-1] }}</h4></div>
+                        {% endfor %}
+                    </div>
+                {% endif %}           
+            
+            {% else %}
+                <div class="content">{{ text_error }}</div>
+                <div style="display:none;" id="simplecheckout_cart_total">{{ cart_total }}</div>
+                {% if display_weight %}
+                    <div style="display:none;" id="simplecheckout_cart_weight">{{ weight }}</div>
+                {% endif %}
+                {% if not popup and not as_module %}
+                    <div class="simplecheckout-button-block buttons">
+                        <div class="simplecheckout-button-right right"><a href="{{ continue }}" class="button btn-primary button_oc btn"><span>{{ button_continue }}</span></a></div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% if not ajax and not popup and not as_module %}
+</div>
+{% include simple_footer %}
+{% endif %}
+<script>
+    // Функція для перевірки, чи вибрано метод доставки Нова Пошта
+    function novaposhtaActiveCheck() {
+        // Знаходимо елемент, що містить варіанти доставки
+        let shipping_method = document.querySelector("#simplecheckout_shipping");
+
+        // Якщо елемент знайдено
+        if (shipping_method) {
+            // Отримуємо всі інпути в цьому елементі
+            let allInputs = shipping_method.querySelectorAll("input");
+
+            // Перевіряємо кожен інпут
+            for (let input of allInputs) {
+                // Якщо інпут належить до Нової Пошти і він вибраний
+                if (input.id.startsWith("novaposhta") && input.checked) {
+                    // Повертаємо ID вибраного інпута
+                    return input.id;
+                }
+            }
+        }
+
+        // Якщо метод доставки Нова Пошта не вибрано, повертаємо false
+        return false;
+    }
+
+    // Функція, що активується при кліку на поле міста
+    function cityClick() {
+        // Перевіряємо, чи вибрано Нову Пошту
+        let active = novaposhtaActiveCheck();
+
+        // Якщо Нова Пошта вибрана
+        if (active) {
+            // Знаходимо поле вводу для міста
+            let city = document.querySelector("#shipping_address_city");
+            // Якщо поле знайдено
+            if (city) {
+                // Відключаємо автозаповнення для поля вводу
+                autocompleteInputOff(city);
+                // Встановлюємо плейсхолдер для поля вводу
+                city.setAttribute("placeholder", "Введіть назву міста/населеного пункта")
+                // Додаємо обробник події для вводу тексту
+                city.addEventListener("keyup", e => {
+                    cityValue = city.value;
+                    // Якщо довжина введеного тексту більше 2 символів
+                    if (cityValue.length > 0) {
+                        // Викликаємо функцію пошуку населеного пункту
+                        searchSettlements(cityValue, city)
+                    }
+                })
+
+                city.addEventListener("click", e => {
+                    cityValue = city.value;
+                    // Якщо довжина введеного тексту більше 2 символів
+                    if (cityValue.length > 2) {
+                        // Викликаємо функцію пошуку населеного пункту
+                        searchSettlements(cityValue, city)
+                    }
+                })
+            }
+        }
+    }
+
+    // Створює та відображає випадаюче меню зі списком населених пунктів
+    function bildMenu(input, array) {
+        let startBildMenu = false;
+        let menuDiv;
+
+        // Перевірка, чи маємо масив з даними для побудови меню
+        if (array.length > 0) {
+            startBildMenu = true;
+        }
+
+        // Шукаємо чи створюємо новий контейнер для меню
+        menuDiv = document.querySelector(".list-novaposhta");
+        if (menuDiv) {
+            menuDiv.innerHTML = ""; // Очищаємо існуюче меню
+        } else {
+            menuDiv = document.createElement("div");
+            menuDiv.classList.add("list-novaposhta"); // Створюємо нове меню
+        }
+
+        // Побудова елементів меню, якщо маємо дані
+        if (startBildMenu) {
+            for (let list of array) {
+                console.log(list)
+                let newlist = document.createElement('div');
+                
+                if(list.DeliveryCity){
+                    newlist.setAttribute("Ref", list.DeliveryCity); // Встановлюємо атрибут Ref
+                    newlist.textContent = list.Present; // Додаємо назву населеного пункту
+                    newlist.setAttribute("CityRef", list.Ref); // Встановлюємо атрибут Ref
+                }else if (list.SettlementStreetDescription){
+                    newlist.textContent = list.SettlementStreetDescription
+                }else{
+                    newlist.textContent = list.Description; // Додаємо назву населеного пункту
+                }
+
+
+                menuDiv.append(newlist); // Додаємо елемент до меню
+            }
+        }
+
+         // Встановлення ширини menuDiv рівною ширині елемента input
+        const inputWidth = input.offsetWidth;
+        menuDiv.style.width = `${inputWidth}px`;
+
+        // Вставка меню в DOM
+        let parent = input.closest(".col-sm-8");
+        parent.append(menuDiv);
+
+        // Встановлюємо обробник подій для кожного елемента меню
+        lithenerMenuClick(menuDiv);
+    }
+
+    cityClick()
+    departmentClick()
+    adressClick()
+
+    function adressClick(){
+        let adress = document.querySelector("#shipping_address_street")
+        autocompleteInputOff(adress);
+        let city = document.querySelector("#shipping_address_city");
+        city.addEventListener("change",e=>{
+            autocompleteInputOff(adress);
+        })
+        adress.addEventListener("keyup",e=>{
+            attr = city.getAttribute("CityRef")
+            value = adress.value;
+            if(attr && value.length > 2){
+                searchStreet(value,adress,attr)
+            }
+        })
+        adress.addEventListener("click",e=>{
+            attr = city.getAttribute("CityRef")
+            value = adress.value;
+            if(attr && value.length > 2){
+                searchStreet(value,adress,attr)
+            }
+        })
+    }
+
+    // Оголошуємо функцію як асинхронну
+async function searchStreet(value, input, ref) {
+
+    // URL API Нової Пошти
+    const url = 'https://api.novaposhta.ua/v2.0/json/';
+       
+    // Формування даних запиту
+    const requestData = {
+        apiKey: "8a4c10492e15a7da82681b99f6de6c84", // API ключ
+        modelName: "Address",
+        calledMethod: "searchSettlementStreets",
+        methodProperties: {
+            SettlementRef: ref, // Ref населеного пункту
+            StreetName: value, // Назва вулиці, яку шукаємо
+        }
+    };
+
+    // Виконуємо POST запит до API
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // Вказуємо тип контенту
+        },
+        body: JSON.stringify(requestData) // Конвертуємо дані запиту в JSON
+    });
+
+    // Перевіряємо, чи запит успішний
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`); // Генеруємо помилку, якщо статус не ОК
+    }
+
+    // Конвертуємо відповідь у формат JSON
+    const data = await response.json();
+    let array = data.data[0].Addresses; // Отримуємо список вулиць
+    
+    bildMenu(input, array); // Викликаємо функцію для побудови меню з отриманим списком
+
+    return array; // Повертаємо список вулиць
+}
+
+    function departmentClick(){
+        let department = document.querySelector("#shipping_address_address_1")
+
+        if(department){
+
+            autocompleteInputOff(department);
+
+            let active = novaposhtaActiveCheck();
+
+            let city = document.querySelector("#shipping_address_city");
+
+            city.addEventListener("change",e=>{
+                autocompleteInputOff(department);
+            })
+            let attr;
+            department.addEventListener("keyup",e=>{
+                attr = city.getAttribute("ref")
+                if(attr){
+                    let value = department.value;
+                    searchDepartment(value,department,active,attr)
+                }
+            })
+            department.addEventListener("click",e=>{
+                attr = city.getAttribute("ref")
+                if(attr){
+                    let value = department.value;
+                    searchDepartment(value,department,active,attr)
+                }
+            })
+        }
+
+    }
+
+
+    // Асинхронна функція для пошуку відділень за допомогою API Нової Пошти
+    async function searchDepartment(value, input, department, ref) {
+
+    // URL API Нової Пошти
+    const url = 'https://api.novaposhta.ua/v2.0/json/';
+        if(department == "novaposhta.warehouse"){
+            //(Поштове відділення)
+            type = "841339c7-591a-42e2-8233-7a0a00f0ed6f"
+        }else{
+            //(Поштомат)
+            type = "f9316480-5f2d-425d-bc2c-ac7cd29decf0"
+
+        }
+    // Формування даних запиту
+    const requestData = {
+        apiKey: "8a4c10492e15a7da82681b99f6de6c84", // API ключ
+        modelName: "Address",
+        calledMethod: "getWarehouses",
+        methodProperties: {
+            CityRef: ref, // Назва міста, яке шукаємо
+            FindByString: value,
+            TypeOfWarehouseRef: type,
+            Language : "UA",
+            Page : "1",
+            Limit : "20"
+        }
+    };
+
+        // Виконуємо POST запит до API
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Вказуємо тип контенту
+            },
+            body: JSON.stringify(requestData) // Конвертуємо дані запиту в JSON
+        });
+
+        // Перевіряємо, чи запит успішний
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`); // Генеруємо помилку, якщо статус не ОК
+        }
+
+        // Конвертуємо відповідь у формат JSON
+        const data = await response.json();
+        let array = data.data; // Отримуємо список адрес
+        bildMenu(input, array); // Викликаємо функцію для побудови меню з отриманим списком
+
+        return array; // Повертаємо список адрес
+
+}
+
+
+
+    // Додає обробники подій кліку на елементи випадаючого меню
+    function lithenerMenuClick(menuDiv) {
+        let divElements = menuDiv.querySelectorAll("div");
+
+        // Для кожного елемента меню
+        divElements.forEach(div => {
+            // Додаємо обробник подій на клік
+            div.addEventListener("click", e => {
+                let ref = div.getAttribute("ref"); // Отримуємо значення атрибуту Ref
+                let CityRef = div.getAttribute("CityRef"); // Отримуємо значення атрибуту Ref
+                
+                let text = div.textContent; // Отримуємо текст елемента
+
+                // Отримуємо батьківський елемент
+                let parent = menuDiv.closest(".col-sm-8");
+                // Знаходимо поле вводу в батьківському елементі
+                let input = parent.querySelector("input");
+                input.setAttribute("ref", ref); // Встановлюємо атрибут Ref для поля вводу
+                input.setAttribute("CityRef", CityRef); // Встановлюємо атрибут Ref для поля вводу
+
+                input.value = text; // Встановлюємо вибраний текст у поле вводу
+
+                // Прибираємо меню з DOM
+                menuDiv.remove();
+            });
+        });
+            // Додаємо обробник подій на клік на документ, щоб закривати меню при кліку поза його межами
+        document.addEventListener("click", function(event) {
+            // Перевіряємо, чи клік відбувся поза меню
+            if (!menuDiv.contains(event.target)) {
+                menuDiv.remove(); // Видаляємо меню
+            }
+        });
+    }
+
+    // Асинхронна функція для пошуку населених пунктів за допомогою API Нової Пошти
+async function searchSettlements(value, input) {
+    // URL API Нової Пошти
+    const url = 'https://api.novaposhta.ua/v2.0/json/';
+
+    // Формування даних запиту
+    const requestData = {
+        apiKey: "8a4c10492e15a7da82681b99f6de6c84", // API ключ
+        modelName: "Address",
+        calledMethod: "searchSettlements",
+        methodProperties: {
+            CityName: value, // Назва міста, яке шукаємо
+            Page : "1",
+            Limit : "20"
+        }
+    };
+
+    try {
+        // Виконуємо POST запит до API
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Вказуємо тип контенту
+            },
+            body: JSON.stringify(requestData) // Конвертуємо дані запиту в JSON
+        });
+
+        // Перевіряємо, чи запит успішний
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`); // Генеруємо помилку, якщо статус не ОК
+        }
+
+        // Конвертуємо відповідь у формат JSON
+        const data = await response.json();
+        let array = data.data[0].Addresses; // Отримуємо список адрес
+        bildMenu(input, array); // Викликаємо функцію для побудови меню з отриманим списком
+
+        return array; // Повертаємо список адрес
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error); // Логуємо помилку, якщо виникають проблеми з запитом
+    }
+}
+
+
+
+// Функція для відключення автозаповнення в текстовому полі вводу
+function autocompleteInputOff(Element) {
+    // Встановлюємо атрибут autocomplete зі значенням "new-password" для запобігання автозаповнення
+    Element.setAttribute("autocomplete", "new-password");
+    Element.value = "";
+     // Визначаємо, чи пристрій є десктопним
+    const isDesktop = window.innerWidth > 768; // Припустимо, що десктопні пристрої мають ширину більше 768px
+    // Тимчасово робимо поле "тільки для читання", щоб запобігти автозаповненню
+    Element.setAttribute("readonly", true);
+    // Якщо пристрій є десктопним
+    if(isDesktop){
+
+
+        // Встановлюємо обробник події onfocus для видалення атрибута readonly
+        Element.setAttribute("onfocus", "this.removeAttribute('readonly');");
+
+        // Додаємо обробник події focus за допомогою addEventListener
+        Element.addEventListener("focus", function() {
+            // При фокусуванні на полі, знімаємо атрибут readonly
+            this.removeAttribute('readonly');
+        });
+    }else{
+        Element.addEventListener("touchstart", function() {
+            this.removeAttribute('readonly');
+        });
+    }
+}
+
+    // cheak()
+</script>

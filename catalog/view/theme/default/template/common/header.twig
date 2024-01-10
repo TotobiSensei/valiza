@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<!--[if IE 8 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie8"><![endif]-->
+<!--[if IE 9 ]><html dir="{{ direction }}" lang="{{ lang }}" class="ie9"><![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html dir="{{ direction }}" lang="{{ lang }}">
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ title }}</title>
+<base href="{{ base }}" />
+{% if description %}
+<meta name="description" content="{{ description }}" />
+{% endif %}
+{% if keywords %}
+<meta name="keywords" content="{{ keywords }}" />
+{% endif %}
+<!-- <script src="catalog/view/javascript/jquery/jquery-2.1.1.min.js" type="text/javascript"></script>
+<link href="catalog/view/javascript/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+<script src="catalog/view/javascript/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<link href="catalog/view/javascript/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,300,700" rel="stylesheet" type="text/css" />
+<link href="catalog/view/theme/default/stylesheet/stylesheet.css" rel="stylesheet"> -->
+{% for style in styles %}
+<!-- <link href="{{ style.href }}" type="text/css" rel="{{ style.rel }}" media="{{ style.media }}" /> -->
+{% endfor %}
+{% for script in scripts %}
+<!-- <script src="{{ script }}" type="text/javascript"></script> -->
+{% endfor %}
+<!-- <script src="catalog/view/javascript/common.js" type="text/javascript"></script> -->
+{% for link in links %}
+<!-- <link href="{{ link.href }}" rel="{{ link.rel }}" /> -->
+{% endfor %}
+{% for analytic in analytics %}
+{{ analytic }}
+{% endfor %}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/catalog/view/theme/default/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/catalog/view/theme/default/assets/css/slick.css">
+    <link rel="stylesheet" href="/catalog/view/theme/default/assets/css/style.css?=59">
+    
+</head>
+<body>
+    
+    <div class="mobile-menu">
+        <div class="mobile-menu__header d-flex justify-content-between align-items-center p-2">
+            <img src="/catalog/view/theme/default/assets/images/logo.svg" class="logo">
+            <img src="/catalog/view/theme/default/assets/images/icons/close.svg" class="mobile-menu-toggle">
+        </div>
+        <div class="d-flex mobile-menu-profile">
+            <a href="#" class="profile"><img src="/catalog/view/theme/default/assets/images/icons/profile.svg"></a>
+            <a href="#" class="compare"><img src="/catalog/view/theme/default/assets/images/icons/compare.svg"></a>
+            <a href="#" class="wishlist"><img src="/catalog/view/theme/default/assets/images/icons/wishlist.svg"></a>
+            <a href="#" class="cart"><img src="/catalog/view/theme/default/assets/images/icons/cart.svg"></a>
+        </div>
+        <div class="mobile-menu-menu">
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/fiction.svg" class="me-2">Fiction</a>
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/nonfiction.svg" class="me-2">Nonfiction</a>
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/Baby.svg" class="me-2">Дитяче</a>
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/Alien.svg" class="me-2">Комікси та графічні новели</a>
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/Gift.svg" class="me-2">Подарункові книги</a>
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/Horse.svg" class="me-2">Манга</a>
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/Confetti.svg" class="me-2">Акція! знижки!</a>
+            <a href="#"><img src="/catalog/view/theme/default/assets/images/icons/menu/CalendarCheck.svg" class="me-2">Предзамовлення</a>
+        </div>
+        <div class="d-flex flex-column mobile-menu-info mb-20px">
+            <a href="#">Головна</a>
+            <a href="#">Наші магазини</a>
+            <a href="#">Доставка і оплата</a>
+            <a href="#">Програма лояльності</a>
+            <a href="#">Блог</a>
+            <a href="#">Франшиза</a>
+            <a href="#">Контакти</a>
+        </div>
+        <div class="mobile-menu-contacts mb-20px px-2">
+                    <div class="mb-2 fs-16px fw-700">Контакти</div>
+                    <a href="tel:+38 067 271 10 63" class="d-block fs-18px fw-700 mb-1">+38 067 271 10 63</a>
+                    <a href="tel:+38 050 453 70 13" class="d-block fs-18px fw-700">+38 050 453 70 13</a>
+                    <div class="mt-15px">
+                        <div class="fs-12px mb-3px">Час роботи:</div>
+                        <div class="fw-700">По буднях з 10:00 до 18:00</div>
+                    </div>
+                    <div class="mt-15px">
+                        <div class="fs-12px mb-3px">E-mail:</div>
+                        <a href="mailto:info@valliza-book.com.ua" class="fw-700">info@valliza-book.com.ua</a>
+                    </div>
+        </div>
+        <div class="mobile-menu-social mb-20px px-2">
+                    <div class="d-flex">
+                        <a href="#" class="me-1"><img src="/catalog/view/theme/default/assets/images/social/fb.svg"></a>
+                        <a href="#" class="me-1"><img src="/catalog/view/theme/default/assets/images/social/insta.svg"></a>
+                        <a href="#" class="me-1"><img src="/catalog/view/theme/default/assets/images/social/tiktok.svg"></a>
+                    </div>
+        </div>
+    </div>
+    
+    
+    <div class="topbar d-none d-md-block">
+        <div class="container">
+            <div class="topbar-menu-wrap d-flex justify-content-between">
+                <div class="d-flex topbar-menu fs-12px">
+                    <a href="#">Головна</a>
+                    <a href="#">Наші магазини</a>
+                    <a href="#">Доставка і оплата</a>
+                    <a href="#">Програма лояльності</a>
+                    <a href="#">Блог</a>
+                    <a href="#">Франшиза</a>
+                    <a href="#">Контакти</a>
+                </div>
+                <div class="d-flex topbar-menu-language fs-13px">
+                    <a href="#">UA</a>
+                    <a href="#" class="opacity-04">RU</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7 col-xxl-8">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap flex-md-nowrap">
+                        <div class="d-flex align-items-center">
+                            <a class="me-3 d-block d-md-none mobile-menu-toggle"><img src="/catalog/view/theme/default/assets/images/icons/menu-burger.svg"></a>
+                            <img src="/catalog/view/theme/default/assets/images/logo.svg" class="logo">
+                        </div>
+                        <button class="btn btn-purple d-none d-md-inline-flex justify-content-center align-items-center w-160px h-44px"><img src="/catalog/view/theme/default/assets/images/icons/categories.svg" class="me-2 pe-1">Категорії книг</button>
+                        <div class="d-flex nav-profile d-md-none align-items-center">
+                            <a href="#" class="phone"><img src="/catalog/view/theme/default/assets/images/icons/phone.svg"></a>
+                            <a href="#" class="cart"><img src="/catalog/view/theme/default/assets/images/icons/cart.svg"></a>
+                        </div>
+                        <div class="input-group search-wrap">
+                            <img src="/catalog/view/theme/default/assets/images/icons/search-glass.svg">
+                            <input type="text" class="form-control fs-13px h-44px" placeholder="Яку книгу хочете знайти?">
+                            <button class="btn btn-purple w-120px h-44px" type="button">Знайти</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5 col-xxl-4 mt-3 mt-lg-0 d-none d-md-block">
+                    <div class="d-flex align-items-center justify-content-between h-100 ps-xxl-2">
+                        <div class="phone-numbers">
+                            <div class="fs-12px mb-0 mb-lg-1 mr-1 mr-lg-0 text-end">Телефонуйте! По буднях з 10:00 до 18:00</div>
+                            <div class="fs-17px fw-700"><a href="tel:(067) 271-10-63">(067) 271-10-63</a>, <a href="tel:(050) 453-70-13">(050) 453-70-13</a></div>
+                        </div>
+                        <div class="d-flex nav-profile">
+                            <a href="#" class="profile"><img src="/catalog/view/theme/default/assets/images/icons/profile.svg"></a>
+                            <a href="#" class="compare"><img src="/catalog/view/theme/default/assets/images/icons/compare.svg"></a>
+                            <a href="#" class="wishlist"><img src="/catalog/view/theme/default/assets/images/icons/wishlist.svg"></a>
+                            <a href="#" class="cart"><img src="/catalog/view/theme/default/assets/images/icons/cart.svg"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    {# 
+{{ menu }}
+#}

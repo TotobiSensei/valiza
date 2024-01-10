@@ -1,0 +1,138 @@
+@media (min-width: 768px) and (max-width: 1199.98px)
+{
+    .header 
+    {
+        height: 80px;
+    }
+
+    .sc-footer-list .list-unstyled
+    {
+        column-gap: 20px;
+    }
+    /* ---------Footer */
+    .sc-footer-top
+    {
+        flex-direction: column;
+    }
+
+    .sc-footer-top > div
+    {
+        width: 100%;
+    }
+
+    .sc-footer-top .text
+    {
+        text-align: center;
+    }
+
+    .sc-footer-top #footer-subscribe #footer-make-subscribe
+    {
+        width: 30%!important;
+    }
+
+    .sc-footer-list .list-unstyled
+    {
+        column-gap: 20px;
+    }
+}
+
+@media (max-width: 767.98px)
+{
+    .sc-livesearch
+    {
+        top: 70px!important;
+    }
+
+    #search .form-control
+    {
+        height: 45px!important;
+    }
+
+    #sc-search-button
+    {
+        display: none;
+    }
+
+    #search #icon-search
+    {
+        top: 27px;
+        left: 30px;
+        transform: none;
+    }
+
+    .sc-footer-top
+    {
+        flex-direction: column;
+    }
+
+    .sc-footer-top .text
+    {
+        white-space: normal;
+        text-align: center;
+    }
+
+    .sc-footer-credits div:first-child
+    {
+        white-space: normal;
+    }
+
+    .sc-footer-top > div
+    {
+        width: 100%;
+    }
+
+    #logo
+    {
+        display: none!important;
+    }
+
+    .input-group
+    {
+        flex-direction: column;
+    }
+
+    #footer-subscribe img
+    {
+        top: 22%;
+    }
+
+    .input-group #InputSubscribeEmail
+    {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .sc-footer-top #footer-subscribe #footer-make-subscribe
+    {
+        width: 100%!important;
+        border-radius: 4px!important;
+    }
+
+    .sc-footer-title
+    {
+        justify-content: center!important;
+        padding-top: 0!important;
+        padding-bottom: 0!important;
+    }
+
+    .sc-footer-middle-list
+    {
+        text-align: center;
+    }
+
+    .tell
+    {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sc-footer-middle-info
+    {
+        padding-top: 0!important;
+    }
+
+    {
+        padding: 25px;
+    }
+
+}

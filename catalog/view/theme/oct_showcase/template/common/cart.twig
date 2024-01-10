@@ -1,0 +1,9 @@
+{% if oct_popup_cart_status is defined and oct_popup_cart_status %}
+<button title="{{ oct_cart }}" id="cart" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between header-buttons-cart fsz-12 align-items-center align-self-stretch" type="button" onclick="octPopupCart();">
+{% else %}
+<button title="{{ oct_cart }}" id="cart" type="button" class="sc-btn sc-btn-with-icon no-btn d-flex flex-column justify-content-between header-buttons-cart fsz-12 align-items-center align-self-stretch" onclick="location = '{{ cart }}';">
+{% endif %}
+    <img src="catalog/view/theme/oct_showcase/img/menu-icons/cart.svg" alt="">
+    <span>{{ oct_cart }}</span>
+    <span class="header-buttons-cart-quantity px-1">{{ total_products }}</span>
+</button>
